@@ -107,9 +107,7 @@ __END__
       </style>
     </head>
     <body>
-      <article>
-        <%= yield %>
-      </article>
+      <article><%= yield %></article>
     </body>
   </html>
 
