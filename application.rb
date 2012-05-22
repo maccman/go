@@ -70,11 +70,10 @@ __END__
         }
 
         article {
-          display: block;
+          display: inline-block;
           padding: 10px;
           margin: 10px;
           border: 5px solid #000;
-          width: 302px;
         }
 
         li {
@@ -94,6 +93,7 @@ __END__
         }
 
         input {
+          width: 100px;
           padding: 3px;
           border: 1px solid rgba(0, 0, 0, 0.20);
           box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12);
