@@ -1,5 +1,4 @@
 require 'rubygems'
-require 'json'
 require 'sinatra'
 require 'sequel'
 require 'sinatra/sequel'
@@ -19,6 +18,12 @@ class Link < Sequel::Model
   def hit!
     self.hits += 1
     self.save(:validate => false)
+  end
+
+  def validate
+    super
+    errors.add(:name, 'cannot be empty') if !name || name.empty?
+    errors.add(:url, 'cannot be empty') if !url || url.empty?
   end
 end
 
