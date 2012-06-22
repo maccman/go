@@ -6,7 +6,7 @@ migration 'create links' do
   database.create_table :links do
     primary_key :id
     String :name, :unique => true, :null => false
-    String :url, :unique => true, :null => false
+    String :url, :unique => false, :null => false
     Integer :hits, :default => 0
     DateTime :created_at
     index :name
@@ -120,5 +120,5 @@ __END__
   <hr />
 
   <% @links.each do |link| %>
-    <li><a href="/<%= link.name %>"><%= link.name %></a> (<%= link.hits %>)</li>
+    <li><a href="<%= link.url %>"><%= link.name %></a> (<%= link.hits %>)</li>
   <% end %>
