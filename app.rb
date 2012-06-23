@@ -1,6 +1,7 @@
 require 'sinatra'
 require 'sequel'
 require 'sinatra/sequel'
+require 'json'
 
 migration 'create links' do
   database.create_table :links do
@@ -42,6 +43,33 @@ post '/' do
          Sequel::DatabaseError => e
     halt "Error: #{e.message}"
   end
+end
+
+get '/autocomplete' do
+  query = params[:q]
+
+  results = Link.filter(:name.like("#{query}%")).or(:url.like("%#{query}%"))
+  results = results.all.map {|r| r.name }
+
+  content_type :json
+  [query, results].to_json
+end
+
+get '/search' do
+  query = params[:q]
+  link  = Link[:name => query]
+
+  if link
+    redirect "/#{link.name}"
+  else
+    @links = Link.filter(:name.like("#{query}%"))
+    erb :index
+  end
+end
+
+get '/opensearch.xml' do
+  content_type :xml
+  erb :opensearch, :layout => false
 end
 
 get '/:name' do
@@ -104,6 +132,8 @@ __END__
           box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.20), 0 1px 5px 0 rgba(51, 153, 204, 0.4);
         }
       </style>
+
+      <link rel="search" title="Go" href="opensearch.xml" type="application/opensearchdescription+xml"/>
     </head>
     <body>
       <article><%= yield %></article>
@@ -120,5 +150,19 @@ __END__
   <hr />
 
   <% @links.each do |link| %>
-    <li><a href="<%= link.url %>"><%= link.name %></a> (<%= link.hits %>)</li>
+    <li><a href="/<%= link.name %>" title="<%= link.url %>"><%= link.name %></a> (<%= link.hits %>)</li>
   <% end %>
+
+@@ opensearch
+  <OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+    <ShortName>Go</ShortName>
+    <Description>Search Go</Description>
+    <InputEncoding>UTF-8</InputEncoding>
+    <OutputEncoding>UTF-8</OutputEncoding>
+    <Url type="application/x-suggestions+json" method="GET" template="http://go/autocomplete">
+      <Param name="q" value="{searchTerms}"/>
+    </Url>
+    <Url type="text/html" method="GET" template="http://go/search">
+      <Param name="q" value="{searchTerms}"/>
+    </Url>
+  </OpenSearchDescription>
