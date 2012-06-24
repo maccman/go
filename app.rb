@@ -133,7 +133,7 @@ __END__
         }
       </style>
 
-      <link rel="search" title="Go" href="opensearch.xml" type="application/opensearchdescription+xml"/>
+      <link rel="search" title="Go" href="/opensearch.xml" type="application/opensearchdescription+xml"/>
     </head>
     <body>
       <article><%= yield %></article>
@@ -159,10 +159,10 @@ __END__
     <Description>Search Go</Description>
     <InputEncoding>UTF-8</InputEncoding>
     <OutputEncoding>UTF-8</OutputEncoding>
-    <Url type="application/x-suggestions+json" method="GET" template="http://go/autocomplete">
+    <Url type="application/x-suggestions+json" method="GET" template="/autocomplete">
       <Param name="q" value="{searchTerms}"/>
     </Url>
-    <Url type="text/html" method="GET" template="http://go/search">
+    <Url type="text/html" method="GET" template="/search">
       <Param name="q" value="{searchTerms}"/>
     </Url>
   </OpenSearchDescription>
