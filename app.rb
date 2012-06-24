@@ -103,6 +103,11 @@ __END__
           border: 5px solid #000;
         }
 
+        ul {
+          margin: 0;
+          padding: 0;
+        }
+
         li {
           list-style: none;
           margin-bottom: 5px;
@@ -149,9 +154,13 @@ __END__
 
   <hr />
 
-  <% @links.each do |link| %>
-    <li><a href="/<%= link.name %>" title="<%= link.url %>"><%= link.name %></a> (<%= link.hits %>)</li>
-  <% end %>
+  <ul>
+    <% @links.each do |link| %>
+      <li><a href="/<%= link.name %>" title="<%= link.url %>"><%= link.name %></a> (<%= link.hits %>)</li>
+    <% end %>
+  </ul>
+
+  <% if @links.empty? %><p>No results</p><% end %>
 
 @@ opensearch
   <OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
