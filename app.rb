@@ -45,7 +45,7 @@ post '/' do
   end
 end
 
-get '/autocomplete' do
+get '/suggest' do
   query = params[:q]
 
   results = Link.filter(:name.like("#{query}%")).or(:url.like("%#{query}%"))
@@ -159,7 +159,7 @@ __END__
     <Description>Search Go</Description>
     <InputEncoding>UTF-8</InputEncoding>
     <OutputEncoding>UTF-8</OutputEncoding>
-    <Url type="application/x-suggestions+json" method="GET" template="/autocomplete">
+    <Url type="application/x-suggestions+json" method="GET" template="/suggest">
       <Param name="q" value="{searchTerms}"/>
     </Url>
     <Url type="text/html" method="GET" template="/search">
