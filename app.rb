@@ -168,10 +168,10 @@ __END__
     <Description>Search Go</Description>
     <InputEncoding>UTF-8</InputEncoding>
     <OutputEncoding>UTF-8</OutputEncoding>
-    <Url type="application/x-suggestions+json" method="GET" template="/suggest">
+    <Url type="application/x-suggestions+json" method="GET" template="http://go/suggest">
       <Param name="q" value="{searchTerms}"/>
     </Url>
-    <Url type="text/html" method="GET" template="/search">
+    <Url type="text/html" method="GET" template="http://go/search">
       <Param name="q" value="{searchTerms}"/>
     </Url>
   </OpenSearchDescription>
