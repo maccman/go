@@ -72,11 +72,13 @@ get '/opensearch.xml' do
   erb :opensearch, :layout => false
 end
 
-get '/:name' do
+get '/:name/?*?' do
   link = Link[:name => params[:name]]
   halt 404 unless link
   link.hit!
-  redirect link.url
+
+  parts = (params[:splat].first || '').split('/')
+  redirect(link.url % parts)
 end
 
 __END__
