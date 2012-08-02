@@ -3,6 +3,8 @@ require 'sequel'
 require 'sinatra/sequel'
 require 'json'
 
+# Models & migrations
+
 migration 'create links' do
   database.create_table :links do
     primary_key :id
@@ -27,12 +29,18 @@ class Link < Sequel::Model
   end
 end
 
+# Actions
+
 get '/' do
   @links = Link.order(:hits.desc).all
   erb :index
 end
 
-post '/' do
+get '/links' do
+  redirect '/'
+end
+
+post '/links' do
   begin
     Link.create(
       :name => params[:name],
@@ -45,7 +53,7 @@ post '/' do
   end
 end
 
-get '/suggest' do
+get '/links/suggest' do
   query = params[:q]
 
   results = Link.filter(:name.like("#{query}%")).or(:url.like("%#{query}%"))
@@ -55,7 +63,7 @@ get '/suggest' do
   [query, results].to_json
 end
 
-get '/search' do
+get '/links/search' do
   query = params[:q]
   link  = Link[:name => query]
 
@@ -67,9 +75,16 @@ get '/search' do
   end
 end
 
-get '/opensearch.xml' do
+get '/links/opensearch.xml' do
   content_type :xml
   erb :opensearch, :layout => false
+end
+
+get '/links/:id/remove' do
+  link = Link.find(params[:id])
+  halt 404 unless link
+  link.destroy
+  redirect '/'
 end
 
 get '/:name/?*?' do
@@ -78,8 +93,14 @@ get '/:name/?*?' do
   link.hit!
 
   parts = (params[:splat].first || '').split('/')
-  redirect(link.url % parts)
+
+  url = link.url
+  url %= parts if parts.any?
+
+  redirect url
 end
+
+# Views
 
 __END__
 
@@ -96,6 +117,10 @@ __END__
           color: #000;
           text-decoration: none;
           border-bottom: 1px solid #CCC;
+        }
+
+        a:hover {
+          text-decoration: underline;
         }
 
         article {
@@ -115,6 +140,38 @@ __END__
           margin-bottom: 5px;
         }
 
+        li section {
+          display: inline-block;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .name {
+          width: 100px;
+        }
+
+        .url {
+          width: 150px;
+        }
+
+        .actions {
+          width: 50px;
+          text-align: right;
+        }
+
+        .remove {
+          display: none;
+        }
+
+        .actions:hover .remove {
+          display: block;
+        }
+
+        .actions:hover .hits {
+          display: none;
+        }
+
         hr {
           background: 0;
           border: 0;
@@ -129,18 +186,23 @@ __END__
         input {
           width: 100px;
           padding: 3px;
-          border: 1px solid rgba(0, 0, 0, 0.20);
-          box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12);
+
+          border: 1px solid #BBB;
+          border-top-color: #999;
+          box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.1);
+          border-radius: 3px;
         }
 
         input:focus {
+          border: 1px solid #5695DB;
           outline: none;
-          border-color: rgba(51, 153, 204, 0.5);
-          box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.20), 0 1px 5px 0 rgba(51, 153, 204, 0.4);
+          -webkit-box-shadow: inset 0 1px 2px #DDD, 0px 0 5px #5695DB;
+          -moz-box-shadow: 0 0 5px #5695db;
+          box-shadow: inset 0 1px 2px #DDD, 0px 0 5px #5695DB;
         }
       </style>
 
-      <link rel="search" title="Go" href="/opensearch.xml" type="application/opensearchdescription+xml"/>
+      <link rel="search" title="Go" href="/links/opensearch.xml" type="application/opensearchdescription+xml"/>
     </head>
     <body>
       <article><%= yield %></article>
@@ -148,7 +210,7 @@ __END__
   </html>
 
 @@ index
-  <form method="post">
+  <form method="post" action="/links">
     <input type="text" name="name" placeholder="Name" required>
     <input type="url" name="url" placeholder="URL" required>
     <button>Create</button>
@@ -158,7 +220,21 @@ __END__
 
   <ul>
     <% @links.each do |link| %>
-      <li><a href="/<%= link.name %>" title="<%= link.url %>"><%= link.name %></a> (<%= link.hits %>)</li>
+      <li>
+        <section class="name">
+          <a href="/<%= link.name %>"><%= link.name %></a>
+        </section>
+
+        <section class="url" title="<%= link.url %>"><%= link.url %></section>
+
+        <section class="actions">
+          <span class="hits">(<%= link.hits %>)</span>
+
+          <span class="remove">
+            <a href="/links/<%= link.id %>/remove" onclick="return confirm('Are you sure?');" title="remove">X</a>
+          </span>
+        </section>
+      </li>
     <% end %>
   </ul>
 
@@ -170,10 +246,10 @@ __END__
     <Description>Search Go</Description>
     <InputEncoding>UTF-8</InputEncoding>
     <OutputEncoding>UTF-8</OutputEncoding>
-    <Url type="application/x-suggestions+json" method="GET" template="http://go/suggest">
+    <Url type="application/x-suggestions+json" method="GET" template="http://go/links/suggest">
       <Param name="q" value="{searchTerms}"/>
     </Url>
-    <Url type="text/html" method="GET" template="http://go/search">
+    <Url type="text/html" method="GET" template="http://go/links/search">
       <Param name="q" value="{searchTerms}"/>
     </Url>
   </OpenSearchDescription>
