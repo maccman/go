@@ -203,7 +203,7 @@ __END__
       </style>
 
       <link rel="search" title="Go" href="/links/opensearch.xml" type="application/opensearchdescription+xml"/>
-      <title>Go</title>
+      <title>go</title>
     </head>
     <body>
       <article><%= yield %></article>
