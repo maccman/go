@@ -29,6 +29,11 @@ class Link < Sequel::Model
   end
 end
 
+
+configure do
+  set :erb, :escape_html => true
+end
+
 # Actions
 
 get '/' do
