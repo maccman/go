@@ -86,7 +86,7 @@ get '/links/opensearch.xml' do
 end
 
 get '/links/:id/remove' do
-  link = Link.find(params[:id])
+  link = Link.find(:id => params[:id])
   halt 404 unless link
   link.destroy
   redirect '/'
