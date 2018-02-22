@@ -1,4 +1,4 @@
-#Sinatra URL shortener.
+# Sinatra URL shortener
 
 Go is a super simple Sinatra URL shortener for use behind the firewall.
 
