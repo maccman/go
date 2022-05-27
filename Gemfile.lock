@@ -4,7 +4,7 @@ GEM
     daemons (1.1.8)
     erubis (2.7.0)
     eventmachine (0.12.10)
-    rack (1.4.1)
+    rack (1.6.13)
     rack-protection (1.2.0)
       rack
     sequel (3.35.0)
